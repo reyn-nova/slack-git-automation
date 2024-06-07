@@ -131,23 +131,11 @@ jobs:
                         },
                         {
                           "type": "text",
-                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}\n\nMerged by ${{ env.PR_MERGER }}"
                         }
                       ]
                     }
                   ]
                 }
               ]
-            }
-
-      - name: Sending Slack Reply
-        uses: slackapi/slack-github-action@v1.26.0
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-        with:
-          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          payload: |
-            {
-              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
-              "text": "❕ Merged by ${{ env.PR_MERGER }}"
             }
