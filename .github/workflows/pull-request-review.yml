@@ -6,5 +6,34 @@ jobs:
   approved:
     if: github.event.review.state == 'APPROVED'
     runs-on: ubuntu-latest
+    env:
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
+      - name: Find previous Slack message
+        run: |
+          #!/bin/bash
+
+          # Call the Slack API to search for messages
+          response=$(curl -s -X GET "https://slack.com/api/search.messages" \
+            -H "Authorization: Bearer ${{ secrets.SLACK_USER_TOKEN }}" \
+            -G --data-urlencode "query=PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})" \
+            -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
+
+          thread_ts=$(echo $response | jq -r '.messages.matches[0].ts')
+          
+          echo "::set-output name=thread_ts::$thread_ts"
+        id: find-thread-ts
+
       - run: echo "${{ toJSON(github.event) }}"
+      - uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          channel-id: "CHANNEL_ID"
+          payload: |
+            {
+              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
+              "text": "❕ Approved by: ${{ github.event.review.user.login }}"
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
