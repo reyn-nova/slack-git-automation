@@ -14,7 +14,6 @@ jobs:
     steps:
       - name: Join reviewers name
         uses: actions/checkout@v2
-      - name: Define list of strings
         run: |
           echo "::set-output name=joined::${{ github.event.pull_request.requested_reviewers.*.login }}"
         id: join-step
