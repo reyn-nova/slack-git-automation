@@ -52,31 +52,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Join requested reviewers
-        run: |
-          # Extract the requested reviewers' logins from the event payload and convert to JSON
-          reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
-
-          # Use jq to extract the login names and join them with commas
-          joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
-
-          # Output the joined reviewers
-          echo "Joined reviewers: $joined_reviewers"
-          echo "::set-output name=reviewers::$joined_reviewers"
-        id: join-reviewers
-
-      - name: Sending Slack Message
-        uses: slackapi/slack-github-action@v1.26.0
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
-        with:
-          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          payload: |
-            {
-              "thread_ts": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}",
-              "text": "Merged by ${{ env.PR_MERGER }}"
-            }
-            
       - name: Find message in Slack
         run: |
           #!/bin/bash
@@ -93,3 +68,14 @@ jobs:
           # Optionally, you can parse the response to get specific information
           # For example, using jq to parse JSON
           echo "$response" | jq '.messages.matches[] | {username: .username, text: .text, timestamp: .ts}'
+
+      - name: Sending Slack Message
+        uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          payload: |
+            {
+              "text": "Merged by ${{ env.PR_MERGER }}"
+            }
