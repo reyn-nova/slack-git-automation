@@ -34,7 +34,7 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
-              "text": "${{ env.REPO_NAME }}\n\nPR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+              "text": "${{ env.REPO_NAME }}\n\nPR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\nRepo: ${{ env.REPO_NAME }}\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
             }
 
   PR-Closed:
@@ -85,7 +85,7 @@ jobs:
           update-ts: ${{ steps.find-thread-ts.outputs.thread_ts }}
           payload: |
             {
-              "text": "${{ env.REPO_NAME }}\n\n✅ PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+              "text": "✅ PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\nRepo: ${{ env.REPO_NAME }}\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
             }
 
       - name: Sending Slack Reply
