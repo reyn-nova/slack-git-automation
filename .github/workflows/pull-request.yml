@@ -63,11 +63,7 @@ jobs:
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
           # Print the response
-          echo "$response"
-
-          # Optionally, you can parse the response to get specific information
-          # For example, using jq to parse JSON
-          echo "$response" | jq '.messages.matches[] | {username: .username, text: .text, timestamp: .ts}'
+          echo "::set-output name=response::$response"
 
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
