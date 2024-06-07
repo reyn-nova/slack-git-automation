@@ -34,7 +34,32 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
-              "text": "${{ env.REPO_NAME }}\n\nPR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\nRepo: ${{ env.REPO_NAME }}\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+              "blocks": [
+                {
+                  "type": "rich_text",
+                  "elements": [
+                    {
+                      "type": "rich_text_section",
+                      "elements": [
+                        {
+                          "type": "text",
+                          "text": "PR for "
+                        },
+                        {
+                          "type": "link",
+                          "url": "${{ env.PR_URL }}",
+                          "text": "${{ env.REPO_NAME }} | \"${{ env.PR_TITLE }}\" (${{ env.BRANCH_NAME }})",
+                          "unsafe": true
+                        },
+                        {
+                          "type": "text",
+                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
 
   PR-Closed:
@@ -85,7 +110,32 @@ jobs:
           update-ts: ${{ steps.find-thread-ts.outputs.thread_ts }}
           payload: |
             {
-              "text": "✅ PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\nRepo: ${{ env.REPO_NAME }}\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+              "blocks": [
+                {
+                  "type": "rich_text",
+                  "elements": [
+                    {
+                      "type": "rich_text_section",
+                      "elements": [
+                        {
+                          "type": "text",
+                          "text": "✅ PR for "
+                        },
+                        {
+                          "type": "link",
+                          "url": "${{ env.PR_URL }}",
+                          "text": "${{ env.REPO_NAME }} | \"${{ env.PR_TITLE }}\" (${{ env.BRANCH_NAME }})",
+                          "unsafe": true
+                        },
+                        {
+                          "type": "text",
+                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
 
       - name: Sending Slack Reply
