@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Run Construct PR Slack Message
         id: pr-slack-message
-        uses: ./.github/actions/construct-pr-slack-message.yml
+        uses: ./.github/actions/construct-pr-slack-message
 
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
@@ -47,7 +47,7 @@ jobs:
 
       - name: Run Construct PR Slack Message
         id: pr-slack-message
-        uses: ./.github/actions/construct-pr-slack-message.yml
+        uses: ./.github/actions/construct-pr-slack-message
 
       - name: Update previous Slack Message
         uses: slackapi/slack-github-action@v1.26.0
