@@ -115,7 +115,7 @@ jobs:
                       "elements": [
                         {
                           "type": "text",
-                          "text": "PR for ",
+                          "text": "✅ PR for ",
                           "style": {
                             "bold": true
                           }
@@ -131,7 +131,7 @@ jobs:
                         },
                         {
                           "type": "text",
-                          "text": "✅ Merged by ${{ env.PR_MERGER }}",
+                          "text": "❕ Merged by: ${{ env.PR_MERGER }}",
                           "style": {
                             "bold": true
                           }
