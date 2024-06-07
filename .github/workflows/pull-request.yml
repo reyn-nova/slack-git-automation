@@ -12,9 +12,6 @@ jobs:
       PR_OPENER: ${{ github.event.pull_request.user.login }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Join requested reviewers
         run: |
           # Extract the requested reviewers' logins from the event payload and convert to JSON
@@ -31,7 +28,7 @@ jobs:
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
@@ -49,10 +46,7 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       PR_MERGER: ${{ github.event.pull_request.merged_by.login }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Find message in Slack
+      - name: Find previous Slack message
         run: |
           #!/bin/bash
 
@@ -67,10 +61,35 @@ jobs:
           echo "::set-output name=thread_ts::$thread_ts"
         id: find-thread-ts
 
-      - name: Sending Slack Message
+      - name: Join requested reviewers
+        run: |
+          # Extract the requested reviewers' logins from the event payload and convert to JSON
+          reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
+
+          # Use jq to extract the login names and join them with commas
+          joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
+
+          # Output the joined reviewers
+          echo "Joined reviewers: $joined_reviewers"
+          echo "::set-output name=reviewers::$joined_reviewers"
+        id: join-reviewers
+
+      - name: Update previous Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          update-ts: ${{ steps.find-thread-ts.outputs.thread_ts }}
+          payload: |
+            {
+              "text": "✅ PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+            }
+
+      - name: Sending Slack Reply
+        uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
