@@ -149,5 +149,5 @@ jobs:
           payload: |
             {
               "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
-              "text": "Merged by ${{ env.PR_MERGER }}"
+              "text": "❕ Merged by ${{ env.PR_MERGER }}"
             }
