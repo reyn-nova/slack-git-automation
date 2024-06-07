@@ -62,11 +62,10 @@ jobs:
             -G --data-urlencode "query=${{ env.PR_URL }}" \
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
-          # Print the response
-          echo "::set-output name=response::$response"
-        id: find-slack-message
-      - name: Use the JSON response
-        run: echo "${{ steps.find-slack-message.outputs.response }}" | jq .
+          thread_ts=$(echo $response | jq -r '.messages.matches[0].ts')
+          
+          echo "::set-output name=thread_ts::$thread_ts"
+        id: find-thread-ts
 
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
@@ -76,5 +75,6 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
+              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
               "text": "Merged by ${{ env.PR_MERGER }}"
             }
