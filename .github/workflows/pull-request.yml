@@ -29,12 +29,23 @@ jobs:
         id: join-reviewers
 
       - name: Sending Slack Message
-        uses: slackapi/slack-github-action@v1.21.0
+        uses: slackapi/slack-github-action@v1.26.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          slack-message: "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+            {
+              "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                }
+              ]
+            }
 
   PR-Closed:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
@@ -43,7 +54,7 @@ jobs:
       PR_MERGER: ${{ github.event.pull_request.merged_by.login }}
     steps:
       - name: Sending Slack Message
-        uses: slackapi/slack-github-action@v1.21.0
+        uses: slackapi/slack-github-action@v1.26.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
