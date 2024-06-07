@@ -15,4 +15,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          slack-message: "PR for \"$PR_TITLE\" ($BRANCH_NAME)\n$PR_URL"
+          slack-message: "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL}}"
