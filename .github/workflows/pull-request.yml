@@ -13,6 +13,9 @@ jobs:
       PR_OPENER: ${{ github.event.pull_request.user.login }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Join requested reviewers
         run: |
           reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
@@ -74,6 +77,9 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       PR_MERGER: ${{ github.event.pull_request.merged_by.login }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Find previous Slack message
         run: |
           #!/bin/bash
@@ -138,4 +144,16 @@ jobs:
                   ]
                 }
               ]
+            }
+
+      - name: Sending Slack Reply
+        uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          payload: |
+            {
+              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
+              "text": "❕ Merged by ${{ env.PR_MERGER }}"
             }
