@@ -40,8 +40,6 @@ jobs:
             }
 
       - name: Find message in Slack
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
         run: |
           #!/bin/bash
 
@@ -51,7 +49,7 @@ jobs:
 
           # Call the Slack API to search for messages
           response=$(curl -s -X GET "https://slack.com/api/search.messages" \
-            -H "Authorization: Bearer $SLACK_USER_TOKEN" \
+            -H "Authorization: Bearer ${{ secrets.SLACK_USER_TOKEN }}" \
             -G --data-urlencode "query=${{ env.BRANCH_NAME }}" \
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
