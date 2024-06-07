@@ -17,7 +17,7 @@ jobs:
 
       - name: Join requested reviewers
         run: |
-          joined_string=$(IFS=, ; echo "${github.event.pull_request.requested_reviewers.*.login}")
+          joined_string=$(IFS=, ; echo "${{ github.event.pull_request.requested_reviewers.*.login }}")
         
         # Output the joined string
           echo "Joined string: $joined_string"
