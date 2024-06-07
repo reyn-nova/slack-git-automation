@@ -1,6 +1,7 @@
 on:
   pull_request:
-    types: [opened]
+    types: [opened, closed]
+    
 jobs:
   PR-Created:
     runs-on: ubuntu-latest
@@ -18,4 +19,15 @@ jobs:
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           slack-message: "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ env.PR_REVIEWERS }}"
-        
+
+  PR-Closed:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sending Slack Message
+        uses: slackapi/slack-github-action@v1.21.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          slack-message: "Merged"
