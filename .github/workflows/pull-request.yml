@@ -24,6 +24,8 @@ jobs:
   PR-Closed:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    env:
+      PR_MERGER: ${{ github.event.pull_request.merged_by }}
     steps:
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.21.0
@@ -31,4 +33,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          slack-message: "Merged"
+          slack-message: "Merged by ${{ env.PR_MERGER }}"
