@@ -7,8 +7,8 @@ jobs:
     env:
       PR_TITLE: ${{ github.event.pull_request.title }}
       PR_URL: ${{ github.event.pull_request.html_url }}
-      PR_OPENER: ${{ github.event.pull_request.user.login }}
-      PR_REVIEWERS: ${{ toJSON(github.event.pull_request.requested_reviewers) }}
+      PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+      PR_REVIEWER: ${{ toJSON(github.event.pull_request.requested_reviewers) }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
       - name: Sending Slack Message
@@ -17,4 +17,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          slack-message: "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\Opened by: ${{ env.PR_OPENER }}\nRequested Reviewer: ${{ env.PR_REVIEWERS }}"
+          slack-message: "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nAuthor: ${{ env.PR_AUTHOR }}\nRequested Reviewer: ${{ env.PR_REVIEWER }}"
