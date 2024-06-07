@@ -131,7 +131,7 @@ jobs:
                         },
                         {
                           "type": "text",
-                          "text": "❕ Merged by: ${{ env.PR_MERGER }}",
+                          "text": "\n❕ Merged by: ${{ env.PR_MERGER }}",
                           "style": {
                             "bold": true
                           }
