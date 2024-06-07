@@ -1,9 +1,10 @@
 on:
   pull_request:
     types: [opened, closed]
-    
+
 jobs:
   PR-Created:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
     env:
       PR_TITLE: ${{ github.event.pull_request.title }}
