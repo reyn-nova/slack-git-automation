@@ -12,11 +12,22 @@ jobs:
       PR_OPENER: ${{ github.event.pull_request.user.login }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
-      - name: Join reviewers name
+      - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Join requested reviewers
         run: |
-          echo "::set-output name=joined::${{ toJSON(github.event.pull_request.requested_reviewers.*.login) }}"
-        id: join-step
+          # Extract the requested reviewers' logins from the event payload
+          reviewers=$(echo "${{ toJson(github.event.pull_request.requested_reviewers) }}" | jq -r '.[].login')
+          
+          # Join the reviewers' logins into a single string separated by commas
+          joined_reviewers=$(echo "${reviewers}" | paste -sd "," -)
+          
+          # Output the joined reviewers
+          echo "Joined reviewers: $joined_reviewers"
+          echo "::set-output name=reviewers::$joined_reviewers"
+        id: join-reviewers
+
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
@@ -25,7 +36,7 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
-              "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-step.outputs.joined }}"
+              "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
             }
 
   PR-Closed:
