@@ -2,7 +2,7 @@ on:
   pull_request:
     types: [opened]
 jobs:
-  Explore-GitHub-Actions:
+  PR-Created:
     runs-on: ubuntu-latest
     env:
       PR_TITLE: ${{ github.event.pull_request.title }}
@@ -23,7 +23,7 @@ on:
   pull_request:
     types: [closed]
 jobs:
-  Explore-GitHub-Actions:
+  PR-Closed:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
