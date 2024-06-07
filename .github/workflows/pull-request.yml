@@ -15,14 +15,9 @@ jobs:
     steps:
       - name: Join requested reviewers
         run: |
-          # Extract the requested reviewers' logins from the event payload and convert to JSON
           reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
-
-          # Use jq to extract the login names and join them with commas
           joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
 
-          # Output the joined reviewers
-          echo "Joined reviewers: $joined_reviewers"
           echo "::set-output name=reviewers::$joined_reviewers"
         id: join-reviewers
 
@@ -43,13 +38,19 @@ jobs:
                       "elements": [
                         {
                           "type": "text",
-                          "text": "PR for "
+                          "text": "PR for ",
+                          "style": {
+                            "bold": true
+                          }
                         },
                         {
                           "type": "link",
                           "url": "${{ env.PR_URL }}",
                           "text": "${{ env.REPO_NAME }} | \"${{ env.PR_TITLE }}\" (${{ env.BRANCH_NAME }})",
-                          "unsafe": true
+                          "unsafe": true,
+                          "style": {
+                            "bold": true
+                          }
                         },
                         {
                           "type": "text",
@@ -90,14 +91,9 @@ jobs:
 
       - name: Join requested reviewers
         run: |
-          # Extract the requested reviewers' logins from the event payload and convert to JSON
           reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
-
-          # Use jq to extract the login names and join them with commas
           joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
 
-          # Output the joined reviewers
-          echo "Joined reviewers: $joined_reviewers"
           echo "::set-output name=reviewers::$joined_reviewers"
         id: join-reviewers
 
@@ -119,13 +115,19 @@ jobs:
                       "elements": [
                         {
                           "type": "text",
-                          "text": "✅ PR for "
+                          "text": "✅ PR for ",
+                          "style": {
+                            "bold": true
+                          }
                         },
                         {
                           "type": "link",
                           "url": "${{ env.PR_URL }}",
                           "text": "${{ env.REPO_NAME }} | \"${{ env.PR_TITLE }}\" (${{ env.BRANCH_NAME }})",
-                          "unsafe": true
+                          "unsafe": true,
+                          "style": {
+                            "bold": true
+                          }
                         },
                         {
                           "type": "text",
