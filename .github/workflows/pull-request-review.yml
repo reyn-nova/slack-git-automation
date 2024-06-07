@@ -9,7 +9,6 @@ jobs:
     env:
       REPO_NAME: ${{ github.event.pull_request.base.repo.name }}
       PR_TITLE: ${{ github.event.pull_request.title }}
-      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
       - name: Find previous Slack message
         run: |
@@ -18,7 +17,7 @@ jobs:
           # Call the Slack API to search for messages
           response=$(curl -s -X GET "https://slack.com/api/search.messages" \
             -H "Authorization: Bearer ${{ secrets.SLACK_USER_TOKEN }}" \
-            -G --data-urlencode "query=PR for ${{ env.REPO_NAME }} | \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})" \
+            -G --data-urlencode "query=PR for ${{ env.REPO_NAME }} | \"${{ env.PR_TITLE}}\"" \
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
           thread_ts=$(echo $response | jq -r '.messages.matches[0].ts')
