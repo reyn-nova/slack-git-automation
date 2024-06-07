@@ -15,7 +15,7 @@ jobs:
       - name: Join reviewers name
         uses: actions/checkout@v2
         run: |
-          echo "::set-output name=joined::${{ github.event.pull_request.requested_reviewers.*.login }}"
+          echo "::set-output name=joined::${{ toJSON(github.event.pull_request.requested_reviewers.*.login) }}"
         id: join-step
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
