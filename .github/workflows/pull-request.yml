@@ -43,12 +43,36 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
+      PR_TITLE: ${{ github.event.pull_request.title }}
+      PR_URL: ${{ github.event.pull_request.html_url }}
+      PR_OPENER: ${{ github.event.pull_request.user.login }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       PR_MERGER: ${{ github.event.pull_request.merged_by.login }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Join requested reviewers
+        run: |
+          # Extract the requested reviewers' logins from the event payload and convert to JSON
+          reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
+
+          # Use jq to extract the login names and join them with commas
+          joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
+
+          # Output the joined reviewers
+          echo "Joined reviewers: $joined_reviewers"
+          echo "::set-output name=reviewers::$joined_reviewers"
+        id: join-reviewers
+
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          slack-message: "Merged by ${{ env.PR_MERGER }}"
+          payload: |
+            {
+              "thread_ts": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}",
+              "text": "Merged by ${{ env.PR_MERGER }}"
+            }
