@@ -59,7 +59,7 @@ jobs:
           # Call the Slack API to search for messages
           response=$(curl -s -X GET "https://slack.com/api/search.messages" \
             -H "Authorization: Bearer ${{ secrets.SLACK_USER_TOKEN }}" \
-            -G --data-urlencode "query=PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}" \
+            -G --data-urlencode "query=${{ env.PR_URL }}" \
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
           # Print the response
