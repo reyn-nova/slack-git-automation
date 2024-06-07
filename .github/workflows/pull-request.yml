@@ -18,7 +18,7 @@ jobs:
       - name: Join requested reviewers
         run: |
           # Extract the requested reviewers' logins from the event payload
-          reviewers=$(echo "${{ toJson(github.event.pull_request.requested_reviewers) }}" | jq -r '.[].login')
+          reviewers=$(echo "${{ toJson(github.event.pull_request.requested_reviewers.*.login) }}"')
           
           # Join the reviewers' logins into a single string separated by commas
           joined_reviewers=$(echo "${reviewers}" | paste -sd "," -)
