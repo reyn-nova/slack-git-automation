@@ -3,30 +3,6 @@ on:
     types: [opened, closed]
 
 jobs:
-  Join-Reviewers:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Join requested reviewers
-      run: |
-        # Extract the requested reviewers' logins from the event payload and convert to JSON
-        reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
-
-        # Use jq to extract the login names and join them with commas
-        joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
-
-        # Output the joined reviewers
-        echo "Joined reviewers: $joined_reviewers"
-        echo "::set-output name=reviewers::$joined_reviewers"
-      id: join-reviewers
-
-    - name: Use joined reviewers
-      run: |
-        echo "The joined reviewers are: ${{ steps.join-reviewers.outputs.reviewers }}"
-
   PR-Created:
     if: github.event_name == 'pull_request' && github.event.action == 'opened'
     runs-on: ubuntu-latest
@@ -37,6 +13,26 @@ jobs:
       PR_REVIEWERS: ${{ toJSON(github.event.pull_request.requested_reviewers.*.login) }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Join requested reviewers
+        run: |
+          # Extract the requested reviewers' logins from the event payload and convert to JSON
+          reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
+
+          # Use jq to extract the login names and join them with commas
+          joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
+
+          # Output the joined reviewers
+          echo "Joined reviewers: $joined_reviewers"
+          echo "::set-output name=reviewers::$joined_reviewers"
+        id: join-reviewers
+
+      - name: Use joined reviewers
+        run: |
+          echo "The joined reviewers are: ${{ steps.join-reviewers.outputs.reviewers }}"
+
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.21.0
         env:
