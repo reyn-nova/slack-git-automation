@@ -64,6 +64,9 @@ jobs:
 
           # Print the response
           echo "::set-output name=response::$response"
+        id: find-slack-message
+      - name: Use the JSON response
+        run: echo "${{ steps.find-slack-message.outputs.response }}" | jq .
 
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
