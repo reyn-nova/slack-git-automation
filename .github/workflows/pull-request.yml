@@ -31,7 +31,7 @@ jobs:
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
-          SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
@@ -41,7 +41,7 @@ jobs:
 
       - name: Find message in Slack
         env:
-          SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
         run: |
           #!/bin/bash
 
@@ -91,7 +91,7 @@ jobs:
       - name: Sending Slack Message
         uses: slackapi/slack-github-action@v1.26.0
         env:
-          SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
