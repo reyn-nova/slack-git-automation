@@ -44,7 +44,7 @@ jobs:
           #!/bin/bash
 
           # Define the channel and the query
-          CHANNEL_ID="YOUR_CHANNEL_ID"
+          CHANNEL_ID="${{ secrets.SLACK_TARGET_CHANNEL_ID }}"
           QUERY="Your search query"
 
           # Call the Slack API to search for messages
