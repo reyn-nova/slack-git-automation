@@ -39,6 +39,29 @@ jobs:
               "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
             }
 
+      - name: Find message in Slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          #!/bin/bash
+
+          # Define the channel and the query
+          CHANNEL_ID="YOUR_CHANNEL_ID"
+          QUERY="Your search query"
+
+          # Call the Slack API to search for messages
+          response=$(curl -s -X GET "https://slack.com/api/search.messages" \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -G --data-urlencode "query=${env.BRANCH_NAME}" \
+            -G --data-urlencode "channel=${CHANNEL_ID}")
+
+          # Print the response
+          echo "$response"
+
+          # Optionally, you can parse the response to get specific information
+          # For example, using jq to parse JSON
+          echo "$response" | jq '.messages.matches[] | {username: .username, text: .text, timestamp: .ts}'
+
   PR-Closed:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
