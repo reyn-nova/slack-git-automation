@@ -24,12 +24,10 @@ jobs:
           
           echo "::set-output name=thread_ts::$thread_ts"
         id: find-thread-ts
-
-      - run: echo "${{ toJSON(github.event) }}"
+        
       - uses: slackapi/slack-github-action@v1.26.0
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          channel-id: "CHANNEL_ID"
           payload: |
             {
               "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
