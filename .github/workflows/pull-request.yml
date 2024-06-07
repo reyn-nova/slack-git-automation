@@ -25,7 +25,7 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
-              "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ ${{ steps.join-step.outputs.joined }} }}"
+              "text": "PR for \"${{ env.PR_TITLE}}\" (${{ env.BRANCH_NAME }})\n${{ env.PR_URL }}\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-step.outputs.joined }}"
             }
 
   PR-Closed:
