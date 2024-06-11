@@ -86,10 +86,10 @@ jobs:
 
           thread_ts=$(echo $response | jq -r '.messages.matches[0].ts')
           text=$(echo $response | jq -r '.messages.matches[0].text')
-          requested_reviewers=$(echo -e "$text" | tail -n 1)
+          reviewers=$(echo -e "$text" | tail -n 1)
           
           echo "::set-output name=thread_ts::$thread_ts"
-          echo "::set-output name=reviewers::$requested_reviewers"
+          echo "::set-output name=reviewers::$reviewers"
         id: find-previous-message
 
       - name: Update previous Slack Message
@@ -126,7 +126,7 @@ jobs:
                         },
                         {
                           "type": "text",
-                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.find-previous-message.outputs.requested_reviewers }}"
+                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.find-previous-message.outputs.reviewers }}"
                         }
                       ]
                     }
@@ -142,7 +142,7 @@ jobs:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
           payload: |
             {
-              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
+              "thread_ts": "${{ steps.find-previous-message.outputs.thread_ts }}",
               "blocks": [
                 {
                   "type": "text",
