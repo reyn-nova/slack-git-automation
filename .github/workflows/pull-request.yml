@@ -63,7 +63,7 @@ jobs:
               ]
             }
 
-  PR-Closed:
+  PR-Merged:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
@@ -85,17 +85,12 @@ jobs:
             -G --data-urlencode "channel=${{ secrets.SLACK_TARGET_CHANNEL_ID }}")
 
           thread_ts=$(echo $response | jq -r '.messages.matches[0].ts')
+          text=$(echo $response | jq -r '.messages.matches[0].text')
+          requested_reviewers=$(echo -e "$text" | tail -n 1)
           
           echo "::set-output name=thread_ts::$thread_ts"
-        id: find-thread-ts
-
-      - name: Join requested reviewers
-        run: |
-          reviewers_json=$(echo '${{ toJson(github.event.pull_request.requested_reviewers) }}')
-          joined_reviewers=$(echo "$reviewers_json" | jq -r 'map(.login) | join(",")')
-
-          echo "::set-output name=reviewers::$joined_reviewers"
-        id: join-reviewers
+          echo "::set-output name=reviewers::$requested_reviewers"
+        id: find-previous-message
 
       - name: Update previous Slack Message
         uses: slackapi/slack-github-action@v1.26.0
@@ -103,7 +98,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
           channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
-          update-ts: ${{ steps.find-thread-ts.outputs.thread_ts }}
+          update-ts: ${{ steps.find-previous-message.outputs.thread_ts }}
           payload: |
             {
               "blocks": [
@@ -131,18 +126,30 @@ jobs:
                         },
                         {
                           "type": "text",
-                          "text": "\nMerged by: ${{ env.PR_MERGER }}",
-                          "style": {
-                            "bold": true
-                          }
-                        },
-                        {
-                          "type": "text",
-                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.join-reviewers.outputs.reviewers }}"
+                          "text": "\n\nOpened by: ${{ env.PR_OPENER }}\nRequested Reviewers: ${{ steps.find-previous-message.outputs.requested_reviewers }}"
                         }
                       ]
                     }
                   ]
+                }
+              ]
+            }
+
+      - uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_TARGET_CHANNEL_ID }}
+          payload: |
+            {
+              "thread_ts": "${{ steps.find-thread-ts.outputs.thread_ts }}",
+              "blocks": [
+                {
+                  "type": "text",
+                  "text": "✅ Merged by: ${{ env.PR_MERGER }}",
+                  "style": {
+                    "bold": true
+                  }
                 }
               ]
             }
